@@ -10,14 +10,14 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 try:
     s.bind((server, port))
-
 except socket.error as e:
-    str(e)
+    print(e)
 
 s.listen(2)
 print("Server Started. Waiting for connection...")
 
 def threaded_client(conn):
+    conn.send(str.encode("Connected"))
     reply = ""
     while True:
         try:
@@ -33,11 +33,14 @@ def threaded_client(conn):
 
             conn.sendall(str.encode(reply))
         except socket.error as e:
-            str(e)
+            print(e)
+
+    print("Lost Connection")
+    conn.close()
 
 
 while True:
     conn, addr = s.accept()
     print("Connected to: ", addr)
 
-    start_new_thread(threaded_client, (conn))
+    start_new_thread(threaded_client, (conn,))
